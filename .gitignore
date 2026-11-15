@@ -1,0 +1,10 @@
+# 运行时产物与重型文件不进源码仓库
+.venv/
+.idea/
+__pycache__/
+*.pyc
+outputs/
+swanlog/
+data/official/
+*.tar
+*.zip

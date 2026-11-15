@@ -1,0 +1,14 @@
+# 智训引擎 依赖（构建阶段固化进镜像，运行期不安装、不联网）
+# 镜像 = python:3.10-slim 走 == 锁定；本地 Python 3.12+ 走兼容下限
+# 3.10 兼容性已按 PyPI 元数据核实：
+#   numpy 1.26.4 / scipy 1.13.1 / scikit-learn 1.5.2：均支持 3.9-3.12，互不冲突（numpy 已是 1.x 末版，避开 2.x ABI 问题）
+#   swanlab 0.10.5：Requires-Python>=3.9，依赖 pydantic~=2.0 / click / pyyaml，3.10 无冲突
+#   pytrio 不进镜像：训练平台 SDK，仅开发机用；镜像内 llm.enabled=false 用不到
+numpy==1.26.4; python_version < "3.12"
+numpy>=2.3; python_version >= "3.12"
+scipy==1.13.1; python_version < "3.12"
+scipy>=1.14; python_version >= "3.12"
+scikit-learn==1.5.2; python_version < "3.12"
+scikit-learn>=1.6; python_version >= "3.12"
+pyyaml==6.0.2
+swanlab==0.10.5

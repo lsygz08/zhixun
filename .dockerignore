@@ -1,0 +1,12 @@
+# 构建上下文排除（避免把开发环境打进镜像）
+.venv
+.idea
+.git
+__pycache__
+*.pyc
+outputs
+swanlog
+data
+*.zip
+*.tar
+.DS_Store

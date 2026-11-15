@@ -1,0 +1,97 @@
+# ============================================================
+# 智训引擎 全局配置（对齐《系统运行说明文档》附录A 配置模板）
+# 所有阈值、预算上限、迭代次数都集中在这里，代码中不硬编码。
+# 注意：缩进必须用空格（2 个空格一层），不要用 Tab。
+# ============================================================
+
+run:
+  mode: full              # full 正式运行；dry-run 自检（dry-run 待接入）
+  window: 16              # 单个监视频段的批次数（待接入批次流）
+  device: auto            # cpu / gpu / auto，按可用硬件自动降级
+  stage_timeout_seconds: 60   # new：单阶段超时看门狗（秒）
+  seed: 42                # 扩展：随机种子
+  run_id: ""              # 扩展：留空则自动生成
+
+drift:
+  psi_warn: 0.10          # PSI 预警阈值（只记录）
+  psi_trigger: 0.20       # PSI 触发阈值（进归因）
+  ks_alpha: 0.05          # KS 检验显著性水平（p < 0.05 触发）
+  consecutive: 2          # 连续批次判定（待接入批次流）
+  missing_warning: 0.05   # 扩展：缺失率预警
+  missing_trigger: 0.15   # 扩展：缺失率触发
+  pred_shift_warning: 0.10
+  pred_shift_trigger: 0.20
+
+budget:
+  max_gpu_hours: 48       # 算力预算上限
+  max_labels: 2000        # 标注配额上限
+  max_tokens: 2000000     # 大模型 Token 上限
+
+rsi:
+  max_rounds: 8           # 闭环轮次上限（触顶输出当前最优版本）
+  max_experiments_per_round: 4
+  max_retrain_per_model: 2
+
+rerun:
+  max_attempts: 2         # 仅系统自身原因失败时申请重跑
+
+task:                     # new：任务类型（回归支持待官方数据包接入）
+  type: classification    # classification / regression
+  primary_metric: accuracy   # 主指标（门禁三层 + should_act 用）
+  key_metrics: [f1, auc]     # 关键指标（多指标一致性 warning 用）
+
+model:                    # new：模型层算法（GBDT 需 scikit-learn，不可用自动回退 linear）
+  algorithm: linear       # linear / gbdt
+
+platform:                 # new：官方平台续训闭环（main_platform.py）
+  rounds: 10              # 每个数据集优化轮数（官方要求 10 轮）
+  epochs_per_round: 2     # 每轮追加训练轮数（决策环节可调整）
+  max_training_seconds: 1800   # 总训练时长上限（资源效率 5 分）
+
+gate:
+  baseline: registry      # 静态基线由平台提供版本锁定
+  min_gain: 0.0           # 相对线上模型的最低增益
+  severe_regression_margin: 0.15   # 扩展：多指标一致性 warning 阈值
+  accuracy_floor_ratio: 0.95       # 扩展：should_act 性能未退化阈值
+
+record:
+  backend: swanlab        # 记录后端
+  fallback: local_queue   # 不可用时转本地队列
+  swanlab_api_key: AXmJVUg3276KebsiM6Hew   # 云端 API Key（正式离线评测不生效，走本地队列）
+  swanlab_project: smart-evolution        # 项目名（SDK 只允许英文/数字）
+
+llm:
+  backend: pytrio         # pytrio（PyTRiO SDK，平台额度）/ local（本地 OpenAI 兼容）
+  model_path: /opt/models/qwen3.8-27b
+  fallback_policy: rule
+  enabled: false          # 额度到账后改 true；当前额度未发，保持规则决策
+  base_url: http://localhost:8000/v1   # 本地推理服务地址（平台环境以 PyTRiO 提供的接入方式为准）
+  model: Qwen/Qwen3.8-27B          # 平台官方基础模型（未微调，参数量 <= 27B）
+
+cost:                     # 扩展：每个动作的预估成本
+  finetune_gpu: 0.2
+  finetune_tokens: 1000
+  resample_labels: 200
+  llm_tokens: 500
+
+optimize:                 # 扩展：实验优化
+  min_expected_gain: 0.01
+  bayes_enabled: false
+  grid:
+    C: [0.1, 1.0, 10.0]
+    gamma: [0.01, 0.1, 1.0]
+
+data:                     # 扩展：本地演示假数据
+  n_samples: 800
+  n_features: 8
+  drift: true
+  drift_severity: medium
+  drift_affects_performance: true
+
+rollback:
+  max_history: 10
+
+faults:                   # 扩展：故障注入演示开关
+  inject_finetune_failure: false
+  inject_diagnose_failure: false
+  inject_gate_failure: false
