@@ -208,7 +208,7 @@ def upload_swanlab(record=None):
         import swanlab
         cfg = load_config().get("record") or {}
         if not _SWANLAB_INITED:
-            api_key = cfg.get("swanlab_api_key")
+            api_key = cfg.get("swanlab_api_key") or os.environ.get("SWANLAB_API_KEY")
             project = cfg.get("swanlab_project") or "zhixun"
             if api_key:
                 swanlab.login(api_key=api_key)

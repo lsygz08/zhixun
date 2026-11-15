@@ -57,7 +57,7 @@ gate:
 record:
   backend: swanlab        # 记录后端
   fallback: local_queue   # 不可用时转本地队列
-  swanlab_api_key: AXmJVUg3276KebsiM6Hew   # 云端 API Key（正式离线评测不生效，走本地队列）
+  swanlab_api_key: ""     # 云端 API Key：从环境变量 SWANLAB_API_KEY 读取，不要提交真实 key
   swanlab_project: smart-evolution        # 项目名（SDK 只允许英文/数字）
 
 llm:
